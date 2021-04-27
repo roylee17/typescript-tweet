@@ -1,72 +1,111 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# Tweet Backend
 
 ## Description
 
+Practice TypeScript, GraphQL, TypeORM with Nest.
+
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Installation
+
+## Architecture
+
+![Architecture](./doc/images/architecture.svg)
+
+## Design
+
+### Authentication
+
+* The auth module implements JWT authentication.
+* We handle the authentication at the "transportation layer", which is decoupled from the GraphQL "APIs".
+* The Auth Module supports `Sign Up` and `Sign In` over REST APIs.
+* Every time a user signs in, he/she gets the `accessToken` which valid for and hour.
+* The user uses the `accessToken` to access the tweet module for both REST endpoints and the GraphQL endpoint.
+
+## Quick Start
+
+Download and install *Docker Desktop*
+
+Start PostgreSQL with `docker-compose`
 
 ```bash
-$ npm install
+docker-compose up -d
 ```
 
-## Running the app
+Install node and dependencies
 
 ```bash
-# development
-$ npm run start
+npm install
+```
 
-# watch mode
-$ npm run start:dev
+Start the app
 
-# production mode
-$ npm run start:prod
+```bash
+npm run start
 ```
 
 ## Test
 
-```bash
-# unit tests
-$ npm run test
+We have a few tooling
 
-# e2e tests
-$ npm run test:e2e
+1. Postman
+2. curl
+3. GraphQL Playground http://localhost:3000/graphql
 
-# test coverage
-$ npm run test:cov
+I've created a postman collection for both `Auth Module`, and `Tweet Module`
+We can use it to test both REST and GraphQL APIs.
+
+The other option is to get the JWT using curl, and test with GraphQL Playground
+
+### Test with Postman
+
+1. Import [Postman collection](tools/Tweet.postman_collection)
+
+![Import Postman collection](./doc/images/import-postman-collection.png)
+
+2. Config environment variable for the `url` `http://localhost:3000`
+
+![Config environment variable for host url](./doc/images/set-the-url-environment-variable.png)
+
+3. Sign up and then sign in. This will get an accessToken from the server, and saved for other APIs.
+
+![Get access token](./doc/images/get-access-token.png)
+
+### Sign up and sign in an user, and save its `accessToken`
+
+Sign up an user.
+
+``` shell
+curl -X POST 'http://localhost:3000/auth/signup' \
+-H 'Content-Type: application/json' \
+-d '{
+    "username": "Joesph1@example.org",
+    "password": "O1X0l0bEPtXShuT"
+}'
 ```
 
-## Support
+Sign in as the user
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+``` shell
+curl -X POST 'http://localhost:3000/auth/signin' \
+-H 'Content-Type: application/json' \
+-d '{
+    "username": "Joesph1@example.org",
+    "password": "O1X0l0bEPtXShuT"
+}'
+```
 
-## Stay in touch
+Response:
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+``` json
+{
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvZXNwaDFAZXhhbXBsZS5vcmciLCJpYXQiOjE2MTk1MDIyMTUsImV4cCI6MTYxOTU4ODYxNX0.nsHLRrZlmVtoifNMaBJHm8HKTsMTJJpeN3M46pNi5pM"
+}
+```
+
+Open the GraphQL Playground, and set the token in the HTTP header
+
+![GraphQL Playground](./doc/images/graphql-playground.png)
+
 
 ## License
 

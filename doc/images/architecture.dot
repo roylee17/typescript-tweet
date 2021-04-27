@@ -1,0 +1,56 @@
+digraph G {
+
+        node [shape=record width=1.8 ]
+
+        label="Architecture"
+
+
+        fontsize=16
+        color=blue
+        // margin=25
+        style=dashed
+
+        user [label="User"]
+
+        user -> auth_cntlr [label="REST" ]
+
+        user -> tweet_cntlr [label="REST"]
+        user -> tweet_resolv [label="GraphQL"]
+
+        subgraph cluster_auth {
+                label="Auth Module"
+                labeljust=l
+                labelloc=bottom
+
+                auth_cntlr [label="Auth Controller"]
+                auth_svc [label="Auth Service"]
+                auth_repo [label="Auth Repository"]
+
+                auth_cntlr -> auth_svc [label="Auth DTOs"]
+
+                auth_svc -> auth_repo
+        }
+
+        subgraph cluster_tweet {
+
+                labeljust=r
+                label="Tweet Module"
+                labelloc=bottom
+
+                tweet_cntlr [label="Tweet Controller"]
+                tweet_resolv [label="Tweet Resolver"]
+                tweet_svc [label="Tweet Service"]
+                tweet_repo [label="Tweet Repository"]
+
+                tweet_cntlr -> tweet_svc [label="Tweet DTOs"]
+                tweet_resolv -> tweet_svc [label="Tweet DTOs"]
+
+                tweet_svc -> tweet_repo
+        }
+
+        db [label="PostgresQL"]
+
+        auth_repo -> db
+        tweet_repo -> db
+
+}
