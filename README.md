@@ -27,19 +27,27 @@ Download and install *Docker Desktop*
 
 Start PostgreSQL with `docker-compose`
 
-```bash
+```shell
 docker-compose up -d
+```
+
+Setup the database
+
+``` shell
+psql -h 127.0.0.1 -U postgres -c 'DROP DATABASE IF EXISTS tweet'
+
+psql -h 127.0.0.1 -U postgres -c 'CREATE DATABASE tweet'
 ```
 
 Install node and dependencies
 
-```bash
+```shell
 npm install
 ```
 
 Start the app
 
-```bash
+```shell
 npm run start
 ```
 
